@@ -24,14 +24,14 @@ void ClockDisplay::changeIntensity() {
 }
 
 void ClockDisplay::renderLoading() {
-  this->lc_.setRow(0, 7, 0b00111000);
-  this->lc_.setRow(0, 6, 0b01010100);
-  this->lc_.setRow(0, 5, 0b10010010);
-  this->lc_.setRow(0, 4, 0b11110010);
-  this->lc_.setRow(0, 3, 0b10000010);
-  this->lc_.setRow(0, 2, 0b01000100);
-  this->lc_.setRow(0, 1, 0b00111000);
-  this->lc_.setRow(0, 0, 0b00000000);
+  this->lc_.setRow(0, 7, 0b00000000);
+  this->lc_.setRow(0, 6, 0b00011100);
+  this->lc_.setRow(0, 5, 0b00101010);
+  this->lc_.setRow(0, 4, 0b01001001);
+  this->lc_.setRow(0, 3, 0b01111001);
+  this->lc_.setRow(0, 2, 0b01000001);
+  this->lc_.setRow(0, 1, 0b00100010);
+  this->lc_.setRow(0, 0, 0b00011100);
 }
 
 void ClockDisplay::onTick() {
@@ -51,8 +51,8 @@ void ClockDisplay::renderClockRows_() {
 void ClockDisplay::renderDHTRows_() {
   if (this->dhtSensor_->hasData()) {
     const int temperature = this->dhtSensor_->getTemperature();
-    this->lc_.setRow(0, 1, temperature + (temperature < 0 ? 128 : 0));
-    this->lc_.setRow(0, 0, this->dhtSensor_->getHumidity());
+    this->lc_.setRow(0, 0, temperature + (temperature < 0 ? 128 : 0));
+    this->lc_.setRow(0, 1, this->dhtSensor_->getHumidity());
   } else {
     this->lc_.setRow(0, 1, 0);
     this->lc_.setRow(0, 0, 0);
