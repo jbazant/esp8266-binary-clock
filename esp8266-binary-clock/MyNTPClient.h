@@ -9,12 +9,11 @@
 #include "WiFiUdp.h"
 #include "NTP.h"
 #include "WithTicker.h"
-#include "secrets.h"
 
 
 class MyNTPClient : public NTP, public WithTicker {
     public:
-        MyNTPClient(const char* ntpServer, const uint interval);
+        MyNTPClient(const char* ntpServer, const char* ssid, const char* password, const uint interval);
         void syncTimeAsync();
         void syncTimeSync();
 
@@ -31,6 +30,8 @@ class MyNTPClient : public NTP, public WithTicker {
         bool isSyncing_;
         bool readyForNTPUpdate_;
         const char* ntpServer_;
+        const char* ssid_;
+        const char* password_;
 
         void connectToWiFi_();
         void waitForWiFiSync_();

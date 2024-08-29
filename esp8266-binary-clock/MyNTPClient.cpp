@@ -1,8 +1,8 @@
 #include "MyNTPClient.h"
 
 
-MyNTPClient::MyNTPClient(const char* ntpServer, const uint interval)
-    : NTP(wifiUdp_), WithTicker(interval * 1000), isSyncing_(false), ntpServer_(ntpServer)
+MyNTPClient::MyNTPClient(const char* ntpServer, const char* ssid, const char* password, const uint interval)
+    : NTP(wifiUdp_), WithTicker(interval * 1000), isSyncing_(false), ntpServer_(ntpServer), ssid_(ssid), password_(password)
 {
     this->initTZ();
 }
@@ -52,7 +52,7 @@ void MyNTPClient::onWifiConnectTick() {
 
 void MyNTPClient::connectToWiFi_() {
     Serial.print("Connecting to WiFi: ");
-    WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+    WiFi.begin(this->ssid_, this->password_);
 }
 
 void MyNTPClient::waitForWiFiSync_() {

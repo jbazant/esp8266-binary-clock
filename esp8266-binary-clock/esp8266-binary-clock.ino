@@ -3,6 +3,7 @@
 #include "Buttons.h"
 #include "ClockDisplay.h"
 #include "MyNTPClient.h"
+#include "secrets.h"
 
 // ------------------------- CONFIGURATION -------------------------
 // NTP
@@ -25,7 +26,7 @@
 
 // ------------------------- GLOBAL OBJECTS -------------------------
 
-MyNTPClient ntpClient(NTP_SERVER, NTP_INTERVAL_S);
+MyNTPClient ntpClient(NTP_SERVER, WIFI_SSID, WIFI_PASSWORD, NTP_INTERVAL_S);
 MyDHT dhtSensor(DHT_PIN, DHT_INTERVAL_S);
 Buttons buttons(INTENSITY_BUTTON_PIN, ON_OFF_BUTTON_PIN);
 ClockDisplay display(DIN_PIN, CLK_PIN, CS_PIN, &dhtSensor, &ntpClient);
