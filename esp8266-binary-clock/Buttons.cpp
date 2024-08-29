@@ -4,11 +4,11 @@ volatile bool Buttons::intensityChangeRequested_ = false;
 volatile bool Buttons::switchRequested_ = false;
 
 void ICACHE_RAM_ATTR Buttons::ISR_intensityButtonPressed_() {
-  Buttons::switchRequested_ = true;
+  Buttons::intensityChangeRequested_ = true;
 }
 
 void ICACHE_RAM_ATTR Buttons::ISR_onoffButtonPressed_() {
-  Buttons::intensityChangeRequested_ = true;
+  Buttons::switchRequested_ = true;
 }
 
 Buttons::Buttons(const uint8_t intensityButtonPin, const uint8_t onOffButtonPin): WithTicker(300) {
