@@ -10,8 +10,6 @@ class MyDHT : public WithTicker {
 
     // TODO desctructor
 
-    // TODO read and error flags
-
     bool hasData();
     bool hasError();
     bool isReading();

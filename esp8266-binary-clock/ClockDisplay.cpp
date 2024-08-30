@@ -86,5 +86,9 @@ uint8_t ClockDisplay::getNTPFlags_() {
     flags += 128;
   }
 
+  if (this->ntpClient_->hasError()) {
+    flags += 64;
+  }
+
   return flags;
 }
