@@ -18,25 +18,28 @@ class MyNTPClient : public NTP, public WithTicker {
         void syncTimeSync();
 
         bool isSyncing();
-
+        bool hasError();
 
     protected:
         void onTick();
         void onWifiConnectTick();
-        void initTZ();
 
     private:
         WiFiUDP wifiUdp_;
         bool isSyncing_;
+        bool hasError_;
         bool readyForNTPUpdate_;
+        int pollRetries_;
         const char* ntpServer_;
         const char* ssid_;
         const char* password_;
 
         void connectToWiFi_();
         void waitForWiFiSync_();
-        void disconnectFromWiFi_();
+        bool checkWiFiStatus_();
+        void onWifiConnectionResolved();
         void syncTime_();
+        void disconnectFromWiFi_();
 };
 
 

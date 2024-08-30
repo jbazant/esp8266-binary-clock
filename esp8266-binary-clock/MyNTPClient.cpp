@@ -1,34 +1,36 @@
 #include "MyNTPClient.h"
 
+#define WIFI_CONN_TIMEOUT 30000
+#define WIFI_CONN_TICK 1000
 
 MyNTPClient::MyNTPClient(const char* ntpServer, const char* ssid, const char* password, const uint interval)
-    : NTP(wifiUdp_), WithTicker(interval * 1000), isSyncing_(false), ntpServer_(ntpServer), ssid_(ssid), password_(password)
-{
-    this->initTZ();
-}
-
-void MyNTPClient::syncTimeAsync() {
-    this->stopTicker();
-    this->isSyncing_ = true;
-    this->connectToWiFi_();
-    // TODO move to constant
-    this->ticker_.attach_ms(1000, std::bind(&MyNTPClient::onWifiConnectTick, this));
-}
+    : NTP(wifiUdp_), WithTicker(interval * 1000), isSyncing_(false), hasError_(false), ntpServer_(ntpServer), ssid_(ssid), password_(password)
+{}
 
 bool MyNTPClient::isSyncing() {
   return this->isSyncing_;
 }
 
-void MyNTPClient::initTZ() {
-    this->ruleDST("CEST", Last, Sun, Mar, 2, 120); // last sunday in march 2:00, timetone +120min (+1 GMT + 1h summertime offset)
-    this->ruleSTD("CET", Last, Sun, Oct, 3, 60); // last sunday in october 3:00, timezone +60min (+1 GMT)
+bool MyNTPClient::hasError() {
+  return this->hasError_;
+}
+
+void MyNTPClient::syncTimeAsync() {
+    // stop NTP resync ticker
+    this->stopTicker();
+
+    this->isSyncing_ = true;
+
+    // Connect to WiFi and wait for connection
+    this->connectToWiFi_();
+    this->ticker_.attach_ms(WIFI_CONN_TICK, std::bind(&MyNTPClient::onWifiConnectTick, this));
 }
 
 void MyNTPClient::syncTimeSync() {
+    this->isSyncing_ = true;
     this->connectToWiFi_();
     this->waitForWiFiSync_();
-    this->syncTime_();
-    this->disconnectFromWiFi_();
+    this->onWifiConnectionResolved();
 }
 
 void MyNTPClient::onTick() {
@@ -36,34 +38,75 @@ void MyNTPClient::onTick() {
 }
 
 void MyNTPClient::onWifiConnectTick() {
-    if (WiFi.status() == WL_CONNECTED) {
-        // TODO timeout, TODO error handling
-        Serial.println("Connected");
-        this->stopTicker();
-        this->syncTime_();
-        this->disconnectFromWiFi_();
-        this->isSyncing_ = false;
+    if (!this->checkWiFiStatus_()) {
+        // detach onWifiConnectTick ticker
+        this->ticker_.detach();
+
+        this->onWifiConnectionResolved();
+
+        // start NTP resync ticker
         this->startTicker();
-    } else {
-        Serial.print(WiFi.status());
-        Serial.print("-");
     }
 }
 
 void MyNTPClient::connectToWiFi_() {
     Serial.print("Connecting to WiFi: ");
     WiFi.begin(this->ssid_, this->password_);
+    this->pollRetries_ = WIFI_CONN_TIMEOUT / WIFI_CONN_TICK;
 }
 
 void MyNTPClient::waitForWiFiSync_() {
-    while(WiFi.status() != WL_CONNECTED) {
-        // TODO timeout, TODO error handling
-        delay(1000);
-        Serial.print(WiFi.status());
-        Serial.print("-");
+      while (this->checkWiFiStatus_()) {
+        delay(WIFI_CONN_TICK);
+      }
+}
+
+bool MyNTPClient::checkWiFiStatus_() {
+    bool keepPolling = true;
+
+    // https://realglitch.com/2018/07/arduino-wifi-status-codes/
+    switch (WiFi.status()) {
+        case WL_CONNECTED:
+            this->hasError_ = false;
+            Serial.println("Connected");
+            keepPolling = false;
+            break;
+
+        case WL_NO_SSID_AVAIL:
+            this->hasError_ = true;
+            Serial.println("No SSID available");
+            keepPolling = false;
+            break;
+
+        case WL_CONNECT_FAILED:
+            this->hasError_ = true;
+            Serial.println("Connection failed");
+            keepPolling = false;
+            break;
+
+        case WL_NO_SHIELD:
+            this->hasError_ = true;
+            Serial.println("No shield");
+            keepPolling = false;
+            break;
+
+        default:
+            Serial.print(WiFi.status());
+            Serial.print("-");
+            break;
     }
 
-    Serial.println("Connected");
+    return keepPolling && this->pollRetries_-- > 0;
+}
+
+void MyNTPClient::onWifiConnectionResolved() {
+    // if WiFi is connected, sync time
+    if (!this->hasError_) {
+        this->syncTime_();
+    }
+
+    this->disconnectFromWiFi_();
+    this->isSyncing_ = false;
 }
 
 void MyNTPClient::disconnectFromWiFi_() {
