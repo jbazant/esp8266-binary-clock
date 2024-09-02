@@ -5,6 +5,7 @@
 #include "MyDHT.h"
 #include "MyNTPClient.h"
 #include "WithTicker.h"
+#include <moonPhase.h>
 
 class ClockDisplay: public WithTicker {
   public:
@@ -21,6 +22,7 @@ class ClockDisplay: public WithTicker {
     LedController<1, 1> lc_;
     MyDHT* dhtSensor_;
     MyNTPClient* ntpClient_;
+    moonPhase moonPhase_;
 
     uint8_t currentIntensity_;
     bool isSegmentOn_;
@@ -32,11 +34,7 @@ class ClockDisplay: public WithTicker {
 
     uint8_t getDHTFlags_();
     uint8_t getNTPFlags_();
-
-  // TODO moonphase
-  // https://github.com/Sheaffy/ArduinoMoonPhase/blob/master/MoonPhase.cpp
-
-  // TODO moon shifted
+    uint8_t getMoonPhase_();
 };
 
 #endif

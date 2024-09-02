@@ -44,7 +44,7 @@ void ClockDisplay::renderClockRows_() {
   this->lc_.setRow(0, 6, this->ntpClient_->minutes() + this->getDHTFlags_());
   this->lc_.setRow(0, 5, this->ntpClient_->hours());
   this->lc_.setRow(0, 4, this->ntpClient_->day() + this->dowShifted_());
-  this->lc_.setRow(0, 3, this->ntpClient_->month()); // TODO add moon phase
+  this->lc_.setRow(0, 3, this->ntpClient_->month() + this->getMoonPhase_());
   this->lc_.setRow(0, 2, this->ntpClient_->year() % 100);
 }
 
@@ -91,4 +91,15 @@ uint8_t ClockDisplay::getNTPFlags_() {
   }
 
   return flags;
+}
+
+uint8_t ClockDisplay::getMoonPhase_() {
+  moonData_t moon;
+  moon = this->moonPhase_.getPhase(this->ntpClient_->epoch());
+
+  // moonangle as 0-1 value + 6.25% (half of 12.5%, which is smallest step displayed) * 8 (8 steps)
+  uint8_t ledShift = (int)(((moon.angle / 360.0) + 0.0625) * 8);
+
+  // moon phase is displayed in leftmost 4 leds
+  return (0b00001111 << ledShift) & 0b11110000;
 }
