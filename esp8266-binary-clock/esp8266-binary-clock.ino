@@ -8,7 +8,6 @@
 // ------------------------- CONFIGURATION -------------------------
 // NTP
 #define NTP_SERVER "europe.pool.ntp.org"
-//#define NTP_INTERVAL_S 20
 #define NTP_INTERVAL_S 12 * 3600
 
 // DHT
@@ -52,6 +51,14 @@ void startAllTickers() {
     ntpClient.startTicker();
 }
 
+void advanceAllTickers() {
+    unsigned long currentMillis = millis();
+    dhtSensor.onTimeAdvanced(currentMillis);
+    buttons.onTimeAdvanced(currentMillis);
+    display.onTimeAdvanced(currentMillis);
+    ntpClient.onTimeAdvanced(currentMillis);
+}
+
 void stopAllTickers() {
     dhtSensor.stopTicker();
     buttons.stopTicker();
@@ -77,5 +84,5 @@ void setup() {
 }
 
 void loop() {
-  	// no loop logic, everything is done through tickers
+    advanceAllTickers();
 }

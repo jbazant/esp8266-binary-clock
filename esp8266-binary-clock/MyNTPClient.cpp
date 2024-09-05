@@ -4,7 +4,8 @@
 #define WIFI_CONN_TICK 1000
 
 MyNTPClient::MyNTPClient(const char* ntpServer, const char* ssid, const char* password, const uint interval)
-    : NTP(wifiUdp_), WithTicker(interval * 1000), isSyncing_(false), hasError_(false), ntpServer_(ntpServer), ssid_(ssid), password_(password)
+    : NTP(wifiUdp_), WithTicker(interval * 1000), isSyncing_(false), hasError_(false), ntpServer_(ntpServer),
+      ssid_(ssid), password_(password), defaultSyncInterval_(interval * 1000), wifiSyncInterval_(WIFI_CONN_TICK)
 {}
 
 bool MyNTPClient::isSyncing() {
@@ -16,14 +17,11 @@ bool MyNTPClient::hasError() {
 }
 
 void MyNTPClient::syncTimeAsync() {
-    // stop NTP resync ticker
-    this->stopTicker();
-
     this->isSyncing_ = true;
+    this->setInterval(this->wifiSyncInterval_);
 
     // Connect to WiFi and wait for connection
     this->connectToWiFi_();
-    this->ticker_.attach_ms(WIFI_CONN_TICK, std::bind(&MyNTPClient::onWifiConnectTick, this));
 }
 
 void MyNTPClient::syncTimeSync() {
@@ -34,18 +32,17 @@ void MyNTPClient::syncTimeSync() {
 }
 
 void MyNTPClient::onTick() {
-    this->syncTimeAsync();
+  	if (this->isSyncing_) {
+    	this->onWifiConnectTick();
+  	} else {
+    	this->syncTimeAsync();
+  	}
 }
 
 void MyNTPClient::onWifiConnectTick() {
-    if (!this->checkWiFiStatus_()) {
-        // detach onWifiConnectTick ticker
-        this->ticker_.detach();
-
+  	bool keepPolling = this->checkWiFiStatus_();
+    if (!keepPolling) {
         this->onWifiConnectionResolved();
-
-        // start NTP resync ticker
-        this->startTicker();
     }
 }
 
@@ -56,9 +53,9 @@ void MyNTPClient::connectToWiFi_() {
 }
 
 void MyNTPClient::waitForWiFiSync_() {
-      while (this->checkWiFiStatus_()) {
-        delay(WIFI_CONN_TICK);
-      }
+	while (this->checkWiFiStatus_()) {
+      	delay(WIFI_CONN_TICK);
+    }
 }
 
 bool MyNTPClient::checkWiFiStatus_() {
@@ -107,6 +104,7 @@ void MyNTPClient::onWifiConnectionResolved() {
 
     this->disconnectFromWiFi_();
     this->isSyncing_ = false;
+    this->setInterval(this->defaultSyncInterval_);
 }
 
 void MyNTPClient::disconnectFromWiFi_() {

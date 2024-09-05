@@ -1,6 +1,7 @@
 #ifndef MyDHT_h
 #define MyDHT_h
 
+#include <Arduino.h>
 #include <DHT.h>
 #include "WithTicker.h"
 

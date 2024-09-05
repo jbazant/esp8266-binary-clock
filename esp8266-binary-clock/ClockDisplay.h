@@ -1,6 +1,7 @@
 #ifndef ClockDisplay_h
 #define ClockDisplay_h
 
+#include <Arduino.h>
 #include "LedController.hpp"
 #include "MyDHT.h"
 #include "MyNTPClient.h"
