@@ -34,8 +34,6 @@ The software is written as arduino project mostly in C++ and can be found in the
 ## PCB
 The PCB is designed in KiCad and can be found in the `pcb` folder.
 
-**PCB design is currently in process**
-
 
 ## Case
 The case is designed in OpenScad and can be found in the `case` folder. Optimized for FDM 3D printing.
