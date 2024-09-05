@@ -3,6 +3,8 @@
 #include "Buttons.h"
 #include "ClockDisplay.h"
 #include "MyNTPClient.h"
+#include "WithTicker.h"
+#include "TickerController.h"
 #include "secrets.h"
 
 // ------------------------- CONFIGURATION -------------------------
@@ -29,6 +31,7 @@ MyNTPClient ntpClient(NTP_SERVER, WIFI_SSID, WIFI_PASSWORD, NTP_INTERVAL_S);
 MyDHT dhtSensor(DHT_PIN, DHT_INTERVAL_S);
 Buttons buttons(INTENSITY_BUTTON_PIN, ON_OFF_BUTTON_PIN);
 ClockDisplay display(DIN_PIN, CLK_PIN, CS_PIN, &dhtSensor, &ntpClient);
+TickerController tickerController;
 
 // ------------------------- PROGRAM LOGIC -------------------------
 void initTimezoneAndDST() {
@@ -44,45 +47,38 @@ void switchSegment() {
     display.switchSegment();
 }
 
-void startAllTickers() {
-    dhtSensor.startTicker();
-    buttons.startTicker();
-    display.startTicker();
-    ntpClient.startTicker();
-}
-
-void advanceAllTickers() {
-    unsigned long currentMillis = millis();
-    dhtSensor.onTimeAdvanced(currentMillis);
-    buttons.onTimeAdvanced(currentMillis);
-    display.onTimeAdvanced(currentMillis);
-    ntpClient.onTimeAdvanced(currentMillis);
-}
-
-void stopAllTickers() {
-    dhtSensor.stopTicker();
-    buttons.stopTicker();
-    display.stopTicker();
-    ntpClient.stopTicker();
-}
-
-void setup() {
+void initSerial() {
     Serial.begin(9600);
     Serial.println("");
     Serial.println("-------------");
+}
+
+void registerTickers() {
+    tickerController.addTicker(&ntpClient);
+    tickerController.addTicker(&dhtSensor);
+    tickerController.addTicker(&buttons);
+    tickerController.addTicker(&display);
+}
+
+void setup() {
+    initSerial();
     Serial.println("Initializing:");
+
+  	display.renderLoading();
 
     buttons.onIntensityPressed(changeIntensity);
     buttons.onOnOffPressed(switchSegment);
 
-  	display.renderLoading();
     initTimezoneAndDST();
     ntpClient.syncTimeSync();
 
-    Serial.println("Starting Tickers");
-    startAllTickers();
+    registerTickers();
+    tickerController.startAllTickers();
+
+    Serial.println("Initialized");
 }
 
 void loop() {
-    advanceAllTickers();
+    tickerController.onTimeAdvanced();
+    delay(200);
 }
