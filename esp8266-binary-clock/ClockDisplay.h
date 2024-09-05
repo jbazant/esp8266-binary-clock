@@ -8,6 +8,9 @@
 #include "WithTicker.h"
 #include <moonPhase.h>
 
+#define DEFAULT_INTENSITY 5
+#define INTENSITY_STEP 5
+
 class ClockDisplay: public WithTicker {
   public:
     ClockDisplay(const uint8_t dinPin, const uint8_t clkPin, const uint8_t csPin, MyDHT* dhtSensor, MyNTPClient* ntpClient, const uint refreshRate);

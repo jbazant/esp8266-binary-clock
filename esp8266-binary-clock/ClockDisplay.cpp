@@ -1,7 +1,7 @@
 #include "ClockDisplay.h"
 
 ClockDisplay::ClockDisplay(const uint8_t dinPin, const uint8_t clkPin, const uint8_t csPin, MyDHT* dhtSensor, MyNTPClient* ntpClient, const uint refreshRate)
-: WithTicker(refreshRate), currentIntensity_(10), isSegmentOn_(true), lc_(LedController<1, 1>()), dhtSensor_(dhtSensor), ntpClient_(ntpClient)
+: WithTicker(refreshRate), currentIntensity_(DEFAULT_INTENSITY), isSegmentOn_(true), lc_(LedController<1, 1>()), dhtSensor_(dhtSensor), ntpClient_(ntpClient)
 {
   this->lc_.init(dinPin, clkPin, csPin);
   this->lc_.clearMatrix();
@@ -15,7 +15,7 @@ void ClockDisplay::switchSegment() {
 }
 
 void ClockDisplay::changeIntensity() {
-    this->currentIntensity_ += 5;
+    this->currentIntensity_ += INTENSITY_STEP;
     if (this->currentIntensity_ > 15) {
       this->currentIntensity_ = 0;
     }
