@@ -1,7 +1,3 @@
-//
-// Created by Jiří Bažant on 29.08.2024.
-//
-
 #ifndef MYNTPCLIENT_H
 #define MYNTPCLIENT_H
 
