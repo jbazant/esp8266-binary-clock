@@ -11,7 +11,7 @@ void ICACHE_RAM_ATTR Buttons::ISR_onoffButtonPressed_() {
   Buttons::switchRequested_ = true;
 }
 
-Buttons::Buttons(const uint8_t intensityButtonPin, const uint8_t onOffButtonPin): WithTicker(300) {
+Buttons::Buttons(const uint8_t intensityButtonPin, const uint8_t onOffButtonPin, const uint refreshRate): WithTicker(refreshRate) {
   pinMode(intensityButtonPin, INPUT);
   pinMode(onOffButtonPin, INPUT);
 

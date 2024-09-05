@@ -8,6 +8,8 @@
 #include "secrets.h"
 
 // ------------------------- CONFIGURATION -------------------------
+#define REFRESH_RATE_MS 200
+
 // NTP
 #define NTP_SERVER "europe.pool.ntp.org"
 #define NTP_INTERVAL_S 12 * 3600
@@ -29,8 +31,8 @@
 
 MyNTPClient ntpClient(NTP_SERVER, WIFI_SSID, WIFI_PASSWORD, NTP_INTERVAL_S);
 MyDHT dhtSensor(DHT_PIN, DHT_INTERVAL_S);
-Buttons buttons(INTENSITY_BUTTON_PIN, ON_OFF_BUTTON_PIN);
-ClockDisplay display(DIN_PIN, CLK_PIN, CS_PIN, &dhtSensor, &ntpClient);
+Buttons buttons(INTENSITY_BUTTON_PIN, ON_OFF_BUTTON_PIN, REFRESH_RATE_MS);
+ClockDisplay display(DIN_PIN, CLK_PIN, CS_PIN, &dhtSensor, &ntpClient, REFRESH_RATE_MS);
 TickerController tickerController;
 
 // ------------------------- PROGRAM LOGIC -------------------------
@@ -80,5 +82,6 @@ void setup() {
 
 void loop() {
     tickerController.onTimeAdvanced();
-    delay(200);
+    // note that this is a smallest delay possible, all ticker must be multiples of this delay
+    delay(REFRESH_RATE_MS);
 }

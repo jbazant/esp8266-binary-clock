@@ -1,7 +1,7 @@
 #include "ClockDisplay.h"
 
-ClockDisplay::ClockDisplay(const uint8_t dinPin, const uint8_t clkPin, const uint8_t csPin, MyDHT* dhtSensor, MyNTPClient* ntpClient)
-: WithTicker(250), currentIntensity_(10), isSegmentOn_(true), lc_(LedController<1, 1>()), dhtSensor_(dhtSensor), ntpClient_(ntpClient)
+ClockDisplay::ClockDisplay(const uint8_t dinPin, const uint8_t clkPin, const uint8_t csPin, MyDHT* dhtSensor, MyNTPClient* ntpClient, const uint refreshRate)
+: WithTicker(refreshRate), currentIntensity_(10), isSegmentOn_(true), lc_(LedController<1, 1>()), dhtSensor_(dhtSensor), ntpClient_(ntpClient)
 {
   this->lc_.init(dinPin, clkPin, csPin);
   this->lc_.clearMatrix();

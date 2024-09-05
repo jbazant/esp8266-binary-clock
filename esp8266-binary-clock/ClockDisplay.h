@@ -10,7 +10,7 @@
 
 class ClockDisplay: public WithTicker {
   public:
-    ClockDisplay(const uint8_t dinPin, const uint8_t clkPin, const uint8_t csPin, MyDHT* dhtSensor, MyNTPClient* ntpClient);
+    ClockDisplay(const uint8_t dinPin, const uint8_t clkPin, const uint8_t csPin, MyDHT* dhtSensor, MyNTPClient* ntpClient, const uint refreshRate);
 
     void changeIntensity();
     void switchSegment();

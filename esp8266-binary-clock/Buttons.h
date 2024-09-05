@@ -9,7 +9,7 @@ class Buttons : public WithTicker {
     static volatile bool intensityChangeRequested_;
     static volatile bool switchRequested_;
 
-    Buttons(const uint8_t intensityButtonPin, const uint8_t onOffButtonPin);
+    Buttons(const uint8_t intensityButtonPin, const uint8_t onOffButtonPin, const uint refreshRate);
 
     // TODO desctructor
     void onIntensityPressed(void (*callback)());
