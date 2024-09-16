@@ -21,7 +21,7 @@ class MyDHT : public WithTicker {
     void onTick();
 
   private:
-    DHT11 sensor;
+    DHT22 sensor;
 
     volatile bool hasData_;
     volatile float temperature_;
