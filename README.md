@@ -58,7 +58,7 @@ All the parts should snap together without any screws or glue.
 ### Case top
 - (Optional) color change at heights:
   - start with color for "ventilation" grids
-  - TODO - color for "ventilation" grids
+  - change color at 1.4mm for the base one
 
 ### Case bottom
 Case is printed with supports that are included in the model. After printing, remove the "triangle" simply by tilting it back and forth
