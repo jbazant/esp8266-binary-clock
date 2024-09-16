@@ -36,6 +36,36 @@ The PCB is designed in KiCad and can be found in the `pcb` folder.
 
 
 ## Case
-The case is designed in OpenScad and can be found in the `case` folder. Optimized for FDM 3D printing.
+The case is designed in OpenScad and can be found in the `case` folder. Optimized (well as much as I was able to...) for FDM 3D printing.
 
-**Printable case design is currently in process**
+- optimized for 0.4mm nozzle and 0.2mm layer height
+- tested with PLA
+- no supports needed
+
+Case is divided into 3 parts:
+- top (`case_top.scad`)
+- bottom (`case_bottom.scad`)
+- display cover (`display_plate.scad`)
+
+One can render all parts with the `case.scad` file.
+
+All the parts should snap together without any screws or glue.
+
+### Dependencies
+- **BOSL library** by Revar Desmera ([github](https://github.com/revarbat/BOSL)).
+- **Roboto** (bold) font by Christian Robertson ([Google fonts](https://fonts.google.com/specimen/Roboto0)).
+
+### Case top
+- (Optional) color change at heights:
+  - start with color for "ventilation" grids
+  - TODO - color for "ventilation" grids
+
+### Case bottom
+Case is printed with supports that are included in the model. After printing, remove the "triangle" simply by tilting it back and forth
+and "mouse ears" with a knife.
+
+Assembled PCB (optimized for 1.6mm height) should fit into the model without any screws or glue. Some for is needed to snap it in. 
+
+### Display cover
+- Use some pretty contrast colors for the display cover. Change filament at the height of 1.2mm.
+(Optional) Use nozzle of 0.25mm or smaller for better readability of the labels.

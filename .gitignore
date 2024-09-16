@@ -183,3 +183,4 @@ fp-info-cache
 
 ### Project specific files
 esp8266-binary-clock/secrets.h
+/case/BOSL/
