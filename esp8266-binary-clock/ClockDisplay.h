@@ -8,8 +8,8 @@
 #include "WithTicker.h"
 #include <moonPhase.h>
 
-#define DEFAULT_INTENSITY 5
-#define INTENSITY_STEP 5
+#define DEFAULT_INTENSITY 0
+#define INTENSITY_STEP 7
 
 class ClockDisplay: public WithTicker {
   public:

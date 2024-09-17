@@ -8,7 +8,7 @@
 #include "secrets.h"
 
 // ------------------------- CONFIGURATION -------------------------
-#define REFRESH_RATE_MS 200
+#define REFRESH_RATE_MS 250
 
 // NTP
 #define NTP_SERVER "europe.pool.ntp.org"
@@ -21,6 +21,7 @@
 // BUTTONS
 #define INTENSITY_BUTTON_PIN D3
 #define ON_OFF_BUTTON_PIN D2
+#define BUTTONS_READ_INTERVAL_MS 500
 
 // DISPLAY
 #define DIN_PIN D7
@@ -31,7 +32,7 @@
 
 MyNTPClient ntpClient(NTP_SERVER, WIFI_SSID, WIFI_PASSWORD, NTP_INTERVAL_S);
 MyDHT dhtSensor(DHT_PIN, DHT_INTERVAL_S);
-Buttons buttons(INTENSITY_BUTTON_PIN, ON_OFF_BUTTON_PIN, REFRESH_RATE_MS);
+Buttons buttons(INTENSITY_BUTTON_PIN, ON_OFF_BUTTON_PIN, BUTTONS_READ_INTERVAL_MS);
 ClockDisplay display(DIN_PIN, CLK_PIN, CS_PIN, &dhtSensor, &ntpClient, REFRESH_RATE_MS);
 TickerController tickerController;
 

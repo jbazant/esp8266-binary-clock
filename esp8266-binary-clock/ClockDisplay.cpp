@@ -26,7 +26,7 @@ void ClockDisplay::changeIntensity() {
 void ClockDisplay::renderLoading() {
   this->lc_.setRow(0, 7, 0b00000000);
   this->lc_.setRow(0, 6, 0b00011100);
-  this->lc_.setRow(0, 5, 0b00101010);
+  this->lc_.setRow(0, 5, 0b00001010);
   this->lc_.setRow(0, 4, 0b01001001);
   this->lc_.setRow(0, 3, 0b01111001);
   this->lc_.setRow(0, 2, 0b01000001);
