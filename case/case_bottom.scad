@@ -11,7 +11,8 @@ l=76;
 f=5;
 
 // --- render ---
-xrot(-45) case_bottom(w, l, f);
+xrot(-45) 
+    case_bottom(w, l, f);
 
 // --- modules ----
 module case_bottom(w, l, f) {
@@ -125,6 +126,10 @@ module case_bottom(w, l, f) {
             skadis_hook_double();
     }
     
+    module dht_lock() {
+        color("blue") translate([pcb_w+2-8.5, pcb_l+4+3.2, h1]) lock_cylindric_small();
+    }
+    
     module locks() {
         // translations should have same x and y as for top case
         translate([4, 2.3, h1+h2]) zrot(-90) lock_micro_narrow();
@@ -141,6 +146,7 @@ module case_bottom(w, l, f) {
             pcb_locks();
             skadis_mount();
             custom_print_support();
+            dht_lock();
             locks();
         }
         
