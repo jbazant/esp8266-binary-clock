@@ -12,6 +12,8 @@ Time is synchronized via NTP.
 
 Two buttons allow to disable display and set the brightness.
 
+[![Binary clock](docs/binary_clock.jpg)](docs/binary_clock.jpg)
+
 ## How to read the clock
 
 - Columns correspond to bits. Read them as (from right to left): 1, 2, 4, 8, 16, 32, 64.
@@ -59,6 +61,10 @@ Rows from top to bottom:
 | 1110       | Waning gibbous  | 🌖 |
 | 1100       | Last quarter    | 🌗 |
 | 1000       | Waning crescent | 🌘 |
+
+
+Photo of the clock shows: Wednesday, 18th of September 2024, 12:17:35, full moon, 28°C, 52% relative humidity.
+
 
 ## Hardware
 
