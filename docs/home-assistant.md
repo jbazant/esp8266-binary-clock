@@ -9,21 +9,31 @@ Add the following to your Home Assistant `configuration.yaml`:
 ```yaml
 mqtt:
   sensor:
-    - name: "Binary Clock Temperature"
+    - name: "Temperature"
       unique_id: binary_clock_temperature
       state_topic: "home/binary-clock/temperature"
       unit_of_measurement: "°C"
       device_class: temperature
       state_class: measurement
       expire_after: 1200  # mark unavailable if no update for 20 minutes (2x publish interval)
+      device:
+        identifiers: ["binary_clock"]
+        name: "Binary Clock"
+        model: "ESP8266 Binary Clock"
+        manufacturer: "DIY"
 
-    - name: "Binary Clock Humidity"
+    - name: "Humidity"
       unique_id: binary_clock_humidity
       state_topic: "home/binary-clock/humidity"
       unit_of_measurement: "%"
       device_class: humidity
       state_class: measurement
       expire_after: 1200  # mark unavailable if no update for 20 minutes (2x publish interval)
+      device:
+        identifiers: ["binary_clock"]
+        name: "Binary Clock"
+        model: "ESP8266 Binary Clock"
+        manufacturer: "DIY"
 ```
 
 > **Note:** Adjust `state_topic` values if you changed `MQTT_TOPIC_PREFIX` in `secrets.h`.
@@ -50,11 +60,9 @@ automation:
 
 ```yaml
 type: entities
-title: Binary Clock Sensors
+title: Binary Clock
 entities:
   - entity: sensor.binary_clock_temperature
-    name: Temperature
   - entity: sensor.binary_clock_humidity
-    name: Humidity
 ```
 
