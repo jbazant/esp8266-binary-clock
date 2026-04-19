@@ -6,7 +6,7 @@
 #include "MyDHT.h"
 #include "MyNTPClient.h"
 #include "WithTicker.h"
-#include <moonPhase.h>
+#include "MoonPhase.hpp"
 
 #define DEFAULT_INTENSITY 0
 #define INTENSITY_STEP 7
@@ -26,7 +26,7 @@ class ClockDisplay: public WithTicker {
     LedController<1, 1> lc_;
     MyDHT* dhtSensor_;
     MyNTPClient* ntpClient_;
-    moonPhase moonPhase_;
+    MoonPhase moonPhase_;
 
     uint8_t currentIntensity_;
     bool isSegmentOn_;

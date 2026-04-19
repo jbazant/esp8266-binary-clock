@@ -10,8 +10,8 @@ NTP
 # LedController library by Noah Kirschmann
 # https://github.com/noah1510/LedController
 LedController
-# moonPhaser library by Steve Sienkowski
-# https://github.com/steve-sienk/moonPhaser-avr0
+# moonPhaser library by Cellie
+# https://github.com/CelliesProjects/moonPhase-esp32
 moonPhaser
 # PubSubClient (MQTT) library by Nick O'Leary
 # https://github.com/knolleary/pubsubclient

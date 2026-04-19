@@ -98,7 +98,7 @@ uint8_t ClockDisplay::getMoonPhase_() {
   moon = this->moonPhase_.getPhase(this->ntpClient_->epoch());
 
   // moonangle as 0-1 value + 6.25% (half of 12.5%, which is smallest step displayed) * 8 (8 steps)
-  uint8_t ledShift = (int)(((moon.angle / 360.0) + 0.0625) * 8);
+  uint8_t ledShift = (int)(((moon.angleDeg / 360.0) + 0.0625) * 8);
 
   // moon phase is displayed in leftmost 4 leds
   return (0b00001111 << ledShift) & 0b11110000;

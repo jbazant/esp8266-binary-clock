@@ -84,7 +84,8 @@ satisfy arduino project structure).
 - **DHT library** by Bert Melis ([GitHub](https://github.com/bertmelis/DHT))
 - **NTP library** by Stefan Staub ([GitHub](https://github.com/sstaub/NTP))
 - **LedController** library by Noah Kirschmann ([GitHub](https://github.com/noah1510/LedController))
-- **moonPhaser** library by Steve Sienkowski ([GitHub](https://github.com/steve-sienk/moonPhaser-avr0))
+- **moonPhaser** library by Cellie ([GitHub](https://github.com/CelliesProjects/moonPhase-esp32))
+  - It claims to be not compatible with ESP8266, but it works just fine with version 2.0.0.
 - **PubSubClient** (MQTT) by Nick O'Leary ([GitHub](https://github.com/knolleary/pubsubclient))
 
 All dependencies are also listed in `esp8266-binary-clock/libraries.txt` for reference. Install them via Arduino IDE
