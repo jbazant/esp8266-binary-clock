@@ -1,4 +1,5 @@
 #include "LedController.hpp"
+#include <ESP8266WiFi.h>
 #include "MyDHT.h"
 #include "Buttons.h"
 #include "ClockDisplay.h"
@@ -30,7 +31,8 @@
 
 // ------------------------- GLOBAL OBJECTS -------------------------
 
-MyNTPClient ntpClient(NTP_SERVER, WIFI_SSID, WIFI_PASSWORD, NTP_INTERVAL_S);
+MyNTPClient ntpClient(NTP_SERVER, WIFI_SSID, WIFI_PASSWORD, NTP_INTERVAL_S,
+                      IPAddress(STATIC_IP), IPAddress(GATEWAY_IP), IPAddress(SUBNET_MASK), IPAddress(DNS_IP));
 MyDHT dhtSensor(DHT_PIN, DHT_INTERVAL_S);
 Buttons buttons(INTENSITY_BUTTON_PIN, ON_OFF_BUTTON_PIN, BUTTONS_READ_INTERVAL_MS);
 ClockDisplay display(DIN_PIN, CLK_PIN, CS_PIN, &dhtSensor, &ntpClient, REFRESH_RATE_MS);

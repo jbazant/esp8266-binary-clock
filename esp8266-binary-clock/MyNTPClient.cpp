@@ -3,9 +3,11 @@
 #define WIFI_CONN_TIMEOUT 30000
 #define WIFI_CONN_TICK 1000
 
-MyNTPClient::MyNTPClient(const char* ntpServer, const char* ssid, const char* password, const uint interval)
+MyNTPClient::MyNTPClient(const char* ntpServer, const char* ssid, const char* password, const uint interval,
+                         IPAddress staticIP, IPAddress gateway, IPAddress subnet, IPAddress dns)
     : NTP(wifiUdp_), WithTicker(interval * 1000), isSyncing_(false), hasError_(false), ntpServer_(ntpServer),
-      ssid_(ssid), password_(password), defaultSyncInterval_(interval * 1000), wifiSyncInterval_(WIFI_CONN_TICK)
+      ssid_(ssid), password_(password), staticIP_(staticIP), gateway_(gateway), subnet_(subnet), dns_(dns),
+      defaultSyncInterval_(interval * 1000), wifiSyncInterval_(WIFI_CONN_TICK)
 {}
 
 bool MyNTPClient::isSyncing() {
@@ -48,6 +50,17 @@ void MyNTPClient::onWifiConnectTick() {
 
 void MyNTPClient::connectToWiFi_() {
     Serial.print("Connecting to WiFi: ");
+
+    // Configure static IP if provided
+    if (this->staticIP_ != IPAddress(0,0,0,0)) {
+        WiFi.config(this->staticIP_, this->gateway_, this->subnet_, this->dns_);
+    }
+
+    // Enable fast connect: reuse saved credentials and persistent mode
+    WiFi.persistent(true);
+    WiFi.setAutoConnect(true);
+    WiFi.setAutoReconnect(true);
+
     WiFi.begin(this->ssid_, this->password_);
     this->pollRetries_ = WIFI_CONN_TIMEOUT / WIFI_CONN_TICK;
 }
