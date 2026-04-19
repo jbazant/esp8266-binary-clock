@@ -85,14 +85,23 @@ satisfy arduino project structure).
 - **NTP library** by Stefan Staub ([GitHub](https://github.com/sstaub/NTP))
 - **LedController** library by Noah Kirschmann ([GitHub](https://github.com/noah1510/LedController))
 - **moonPhaser** library by Steve Sienkowski ([GitHub](https://github.com/steve-sienk/moonPhaser-avr0))
+- **PubSubClient** (MQTT) by Nick O'Leary ([GitHub](https://github.com/knolleary/pubsubclient))
+
+All dependencies are also listed in `esp8266-binary-clock/libraries.txt` for reference. Install them via Arduino IDE
+(*Sketch > Include Library > Manage Libraries...*) or Arduino CLI (`arduino-cli lib install "<name>"`).
 
 ### Configuration
 
-- Create `secrets.h` in the `esp8266-binary-clock` and specify your WiFi credentials. (see `secrets.h.example`)
+- Create `secrets.h` in the `esp8266-binary-clock` and specify your WiFi and MQTT credentials. (see `secrets-example.h`)
 - Adjust `CONFIGURATION` section and `initTimezoneAndDST` method in `esp8266-binary-clock.ino` to your needs (or just
   leave as is).
     - `DHT_INTERVAL_S` - interval for reading DHT sensor (in seconds), default 1 minute
     - `NTP_INTERVAL_S` - interval for NTP synchronization (in seconds), default 12 hours
+    - `MQTT_PUBLISH_INTERVAL_S` - interval for publishing temperature & humidity via MQTT (in seconds), default 10 minutes
+
+## Home Assistant
+
+See [`docs/home-assistant.md`](docs/home-assistant.md) for MQTT sensor configuration, an automation example, and a Lovelace card snippet.
 
 ## PCB
 

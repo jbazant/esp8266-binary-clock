@@ -1,0 +1,18 @@
+# Arduino Library Dependencies
+# Install these via Arduino IDE: Sketch > Include Library > Manage Libraries...
+# or via Arduino CLI: arduino-cli lib install "<name>"
+# DHT library by Bert Melis
+# https://github.com/bertmelis/DHT
+DHT
+# NTP library by Stefan Staub
+# https://github.com/sstaub/NTP
+NTP
+# LedController library by Noah Kirschmann
+# https://github.com/noah1510/LedController
+LedController
+# moonPhaser library by Steve Sienkowski
+# https://github.com/steve-sienk/moonPhaser-avr0
+moonPhaser
+# PubSubClient (MQTT) library by Nick O'Leary
+# https://github.com/knolleary/pubsubclient
+PubSubClient

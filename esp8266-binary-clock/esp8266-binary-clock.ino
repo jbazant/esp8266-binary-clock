@@ -6,6 +6,7 @@
 #include "MyNTPClient.h"
 #include "WithTicker.h"
 #include "TickerController.h"
+#include "MyMQTT.h"
 #include "secrets.h"
 
 // ------------------------- CONFIGURATION -------------------------
@@ -29,6 +30,9 @@
 #define CLK_PIN D5
 #define CS_PIN D8
 
+// MQTT
+#define MQTT_PUBLISH_INTERVAL_S 10 * 60
+
 // ------------------------- GLOBAL OBJECTS -------------------------
 
 MyNTPClient ntpClient(NTP_SERVER, WIFI_SSID, WIFI_PASSWORD, NTP_INTERVAL_S,
@@ -37,6 +41,8 @@ MyDHT dhtSensor(DHT_PIN, DHT_INTERVAL_S);
 Buttons buttons(INTENSITY_BUTTON_PIN, ON_OFF_BUTTON_PIN, BUTTONS_READ_INTERVAL_MS);
 ClockDisplay display(DIN_PIN, CLK_PIN, CS_PIN, &dhtSensor, &ntpClient, REFRESH_RATE_MS);
 TickerController tickerController;
+MyMQTT mqttClient(&dhtSensor, WIFI_SSID, WIFI_PASSWORD, MQTT_HOST, MQTT_PORT, MQTT_USER, MQTT_PASSWORD, MQTT_TOPIC_PREFIX, MQTT_PUBLISH_INTERVAL_S,
+                  IPAddress(STATIC_IP), IPAddress(GATEWAY_IP), IPAddress(SUBNET_MASK), IPAddress(DNS_IP));
 
 // ------------------------- PROGRAM LOGIC -------------------------
 void initTimezoneAndDST() {
@@ -63,6 +69,7 @@ void registerTickers() {
     tickerController.addTicker(&dhtSensor);
     tickerController.addTicker(&buttons);
     tickerController.addTicker(&display);
+    tickerController.addTicker(&mqttClient);
 }
 
 void setup() {

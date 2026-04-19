@@ -9,4 +9,11 @@
 #define SUBNET_MASK 255, 255, 255, 0
 #define DNS_IP        8,   8,  8,  8
 
+// MQTT
+#define MQTT_HOST          "your-mqtt-broker-host"
+#define MQTT_PORT          1883
+#define MQTT_USER          "your-mqtt-user"
+#define MQTT_PASSWORD      "your-mqtt-password"
+#define MQTT_TOPIC_PREFIX  "home/binary-clock"
+
 #endif //SECRETS_H
