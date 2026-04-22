@@ -50,9 +50,9 @@ void ClockDisplay::renderClockRows_() {
 
 void ClockDisplay::renderDHTRows_() {
   if (this->dhtSensor_->hasData()) {
-    const int temperature = static_cast<int>(trunc(this->dhtSensor_->getTemperature()));
+    const int temperature = static_cast<int>(round(this->dhtSensor_->getTemperature()));
     this->lc_.setRow(0, 0, temperature + (temperature < 0 ? 128 : 0));
-    this->lc_.setRow(0, 1, static_cast<int>(trunc(this->dhtSensor_->getHumidity())));
+    this->lc_.setRow(0, 1, static_cast<int>(round(this->dhtSensor_->getHumidity())));
   } else {
     this->lc_.setRow(0, 1, 0);
     this->lc_.setRow(0, 0, 0);
