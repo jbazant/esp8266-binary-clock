@@ -7,15 +7,15 @@
 
 class MyDHT : public WithTicker {
   public:
-    MyDHT(const uint8_t pin, const uint interval);
+    MyDHT(const uint8_t pin, const uint interval, const float temperatureOffset = 0.0f, const float humidityOffset = 0.0f);
 
     // TODO desctructor
 
     bool hasData();
     bool hasError();
     bool isReading();
-    int getTemperature();
-    int getHumidity();
+    float getTemperature();
+    float getHumidity();
 
   protected:
     void onTick();
@@ -28,6 +28,8 @@ class MyDHT : public WithTicker {
     volatile float humidity_;
     volatile bool hasError_;
     volatile bool isReading_;
+    float temperatureOffset_;
+    float humidityOffset_;
 
 
     void ICACHE_RAM_ATTR ISR_handleData_(float h, float t);

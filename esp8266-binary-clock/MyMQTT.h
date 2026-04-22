@@ -55,7 +55,7 @@ class MyMQTT : public WithTicker {
         void onMqttDisconnectTick_();
         void disconnectWifi_();
         void publish_();
-        void publishValue_(const char* subtopic, int value);
+        void publishValue_(const char* subtopic, float value);
 };
 
 #endif // MYMQTT_H

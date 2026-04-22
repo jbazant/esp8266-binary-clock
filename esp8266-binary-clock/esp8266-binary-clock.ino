@@ -19,6 +19,8 @@
 // DHT
 #define DHT_PIN D4
 #define DHT_INTERVAL_S 60
+#define DHT_TEMPERATURE_OFFSET -3.0f
+#define DHT_HUMIDITY_OFFSET 0.0f
 
 // BUTTONS
 #define INTENSITY_BUTTON_PIN D3
@@ -37,7 +39,7 @@
 
 MyNTPClient ntpClient(NTP_SERVER, WIFI_SSID, WIFI_PASSWORD, NTP_INTERVAL_S,
                       IPAddress(STATIC_IP), IPAddress(GATEWAY_IP), IPAddress(SUBNET_MASK), IPAddress(DNS_IP));
-MyDHT dhtSensor(DHT_PIN, DHT_INTERVAL_S);
+MyDHT dhtSensor(DHT_PIN, DHT_INTERVAL_S, DHT_TEMPERATURE_OFFSET, DHT_HUMIDITY_OFFSET);
 Buttons buttons(INTENSITY_BUTTON_PIN, ON_OFF_BUTTON_PIN, BUTTONS_READ_INTERVAL_MS);
 ClockDisplay display(DIN_PIN, CLK_PIN, CS_PIN, &dhtSensor, &ntpClient, REFRESH_RATE_MS);
 TickerController tickerController;

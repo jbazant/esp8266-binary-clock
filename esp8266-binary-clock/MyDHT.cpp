@@ -21,8 +21,9 @@ void ICACHE_RAM_ATTR MyDHT::ISR_handleError(uint8_t e) {
   this->isReading_ = false;
 }
 
-MyDHT::MyDHT(const uint8_t pin, const uint interval)
-    : WithTicker(interval * 1000), hasData_(false), hasError_(false), isReading_(false)
+MyDHT::MyDHT(const uint8_t pin, const uint interval, const float temperatureOffset, const float humidityOffset)
+    : WithTicker(interval * 1000), hasData_(false), hasError_(false), isReading_(false),
+      temperatureOffset_(temperatureOffset), humidityOffset_(humidityOffset)
 {
   this->sensor.setPin(pin);
   this->sensor.onData([&](float h, float t){
@@ -55,10 +56,10 @@ bool MyDHT::isReading() {
   return this->isReading_;
 }
 
-int MyDHT::getTemperature() {
-  return int(trunc(this->temperature_));
+float MyDHT::getTemperature() {
+  return roundf((this->temperature_ + this->temperatureOffset_) * 10.0f) / 10.0f;
 }
 
-int MyDHT::getHumidity() {
-  return int(trunc(this->humidity_));
+float MyDHT::getHumidity() {
+  return roundf((this->humidity_ + this->humidityOffset_) * 10.0f) / 10.0f;
 }

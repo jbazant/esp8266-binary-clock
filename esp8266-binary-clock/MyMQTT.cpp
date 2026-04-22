@@ -159,12 +159,12 @@ void MyMQTT::disconnectWifi_() {
     Serial.println("MQTT: WiFi disconnected");
 }
 
-void MyMQTT::publishValue_(const char* subtopic, int value) {
+void MyMQTT::publishValue_(const char* subtopic, float value) {
     char topic[128];
-    char valStr[8];
+    char valStr[16];
 
     snprintf(topic, sizeof(topic), "%s/%s", this->topicPrefix_, subtopic);
-    snprintf(valStr, sizeof(valStr), "%d", value);
+    snprintf(valStr, sizeof(valStr), "%.1f", value);
     this->mqttClient_.publish(topic, valStr, true);
 
     Serial.print("MQTT: published ");
