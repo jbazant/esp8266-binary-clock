@@ -11,7 +11,7 @@ class Buttons : public WithTicker {
 
     Buttons(const uint8_t intensityButtonPin, const uint8_t onOffButtonPin, const uint refreshRate);
 
-    // TODO desctructor
+    // TODO destructor
     void onIntensityPressed(void (*callback)());
     void onOnOffPressed(void (*callback)());
 

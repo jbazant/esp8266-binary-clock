@@ -35,10 +35,12 @@ ESP8266-based binary clock running on a **Wemos D1 Mini**. The clock displays ti
 - **Display segments:** The display cycles between clock, lunar phase, and temperature/humidity views via button press.
 - **Ticker system:** All periodic tasks (NTP sync, sensor reads, button polling, display refresh) are managed by `TickerController` with configurable intervals.
 - **Configuration:** Hardware pins, refresh rates, and intervals are defined as `#define` constants in the main `.ino` file.
+- **Prohibited:** - You can't use `delay()`, you can't use libraries with delays, and you can't block the main loop. This is because the script relies on interrupts. 
 
 ## Conventions
 
 - Each module is split into `.h` / `.cpp` pairs.
 - WiFi credentials are kept in `secrets.h` (see `secrets-example.h` for template).
 - The main loop uses a fixed delay (`REFRESH_RATE_MS`) as the base tick; all ticker intervals must be multiples of this value.
+- Use `this->` for member variables and methods for clarity.
 

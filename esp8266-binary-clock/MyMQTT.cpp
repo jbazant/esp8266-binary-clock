@@ -1,7 +1,11 @@
 #include "MyMQTT.h"
+
 #define WIFI_CONN_TIMEOUT 30000
 #define WIFI_CONN_TICK    1000
 #define MQTT_CONN_TIMEOUT 5000
+#define MQTT_CONN_TICK    500
+#define MQTT_BEFORE_DISCONNECT_TICK 3000
+
 MyMQTT::MyMQTT(MyDHT* dht,
                const char* ssid, const char* password,
                const char* brokerHost, const uint16_t brokerPort,
@@ -15,63 +19,138 @@ MyMQTT::MyMQTT(MyDHT* dht,
       mqttUser_(mqttUser), mqttPassword_(mqttPassword),
       topicPrefix_(topicPrefix),
       staticIP_(staticIP), gateway_(gateway), subnet_(subnet), dns_(dns),
-      mqttClient_(wifiClient_)
+      mqttClient_(wifiClient_),
+      defaultInterval_(intervalSeconds * 1000),
+      wifiSyncInterval_(WIFI_CONN_TICK),
+      mqttSyncInterval_(MQTT_CONN_TICK),
+      mqttDisconnectInterval_(MQTT_BEFORE_DISCONNECT_TICK)
 {}
 
 void MyMQTT::onTick() {
+    switch (this->state_) {
+        case State::IDLE:
+            this->startPublishCycle_();
+            break;
+        case State::WIFI_CONNECTING:
+            this->onWifiConnectTick_();
+            break;
+        case State::MQTT_CONNECTING:
+            this->onMqttConnectTick_();
+            break;
+        case State::MQTT_PUBLISHED:
+            this->onMqttPublishedTick_();
+            break;
+        case State::MQTT_DISCONNECTING:
+            this->onMqttDisconnectTick_();
+            break;
+        default:
+            break;
+    }
+}
+
+void MyMQTT::startPublishCycle_() {
     Serial.println("MQTT: starting publish cycle");
-    if (!dht_->hasData()) {
+    if (!this->dht_->hasData()) {
         Serial.println("MQTT: no DHT data available, skipping");
         return;
     }
-    if (!connectWifi_()) {
-        Serial.println("MQTT: WiFi connection failed, skipping");
-        return;
-    }
-    if (!connectMqtt_()) {
-        Serial.println("MQTT: broker connection failed, skipping");
-        disconnectWifi_();
-        return;
-    }
-    publish_();
-    mqttClient_.disconnect();
-    disconnectWifi_();
-    Serial.println("MQTT: publish cycle done");
-}
 
-bool MyMQTT::connectWifi_() {
-    if (staticIP_ != IPAddress(0, 0, 0, 0)) {
-        WiFi.config(staticIP_, gateway_, subnet_, dns_);
+    if (this->staticIP_ != IPAddress(0, 0, 0, 0)) {
+        WiFi.config(this->staticIP_, this->gateway_, this->subnet_, this->dns_);
     }
     WiFi.persistent(true);
     WiFi.setAutoConnect(true);
     WiFi.setAutoReconnect(true);
-    WiFi.begin(ssid_, password_);
+    WiFi.begin(this->ssid_, this->password_);
     Serial.print("MQTT: connecting to WiFi");
-    unsigned long start = millis();
-    while (WiFi.status() != WL_CONNECTED) {
-        if (millis() - start >= WIFI_CONN_TIMEOUT) {
-            Serial.println(" timed out");
-            return false;
-        }
-        switch (WiFi.status()) {
-            case WL_NO_SSID_AVAIL:
-                Serial.println(" no SSID");
-                return false;
-            case WL_CONNECT_FAILED:
-                Serial.println(" failed");
-                return false;
-            case WL_NO_SHIELD:
-                Serial.println(" no shield");
-                return false;
-            default:
-                break;
-        }
-        delay(WIFI_CONN_TICK);
-        Serial.print(".");
+
+    this->pollRetries_ = WIFI_CONN_TIMEOUT / WIFI_CONN_TICK;
+    this->state_ = State::WIFI_CONNECTING;
+    this->setInterval(this->wifiSyncInterval_);
+}
+
+void MyMQTT::onWifiConnectTick_() {
+    wl_status_t status = WiFi.status();
+
+    if (status == WL_CONNECTED) {
+        Serial.println(" connected");
+        this->onWifiConnectionResolved_();
+        return;
     }
-    Serial.println(" connected");
-    return true;
+    if (status == WL_NO_SSID_AVAIL || status == WL_CONNECT_FAILED || status == WL_NO_SHIELD) {
+        Serial.println(" WiFi error");
+        this->disconnectWifi_();
+        this->state_ = State::IDLE;
+        this->setInterval(this->defaultInterval_);
+        return;
+    }
+    if (this->pollRetries_-- <= 0) {
+        Serial.println(" timed out");
+        this->disconnectWifi_();
+        this->state_ = State::IDLE;
+        this->setInterval(this->defaultInterval_);
+        return;
+    }
+    Serial.print(".");
+}
+
+void MyMQTT::onWifiConnectionResolved_() {
+    this->mqttClient_.setServer(this->brokerHost_, this->brokerPort_);
+    Serial.print("MQTT: connecting to broker");
+    this->state_ = State::MQTT_CONNECTING;
+    this->pollRetries_ = MQTT_CONN_TIMEOUT / MQTT_CONN_TICK;
+    this->setInterval(this->mqttSyncInterval_);
+    // Attempt first connection immediately
+    this->mqttClient_.connect("esp8266-binary-clock", this->mqttUser_, this->mqttPassword_);
+}
+
+void MyMQTT::onMqttConnectTick_() {
+    if (this->mqttClient_.connected()) {
+        Serial.println(" connected");
+        this->publish_();
+        Serial.println("MQTT: published, waiting before disconnect");
+        this->state_ = State::MQTT_PUBLISHED;
+        this->setInterval(this->mqttDisconnectInterval_);
+        return;
+    }
+    if (this->pollRetries_-- <= 0) {
+        Serial.print(" timed out, state=");
+        Serial.println(this->mqttClient_.state());
+        this->disconnectWifi_();
+        this->state_ = State::IDLE;
+        this->setInterval(this->defaultInterval_);
+        return;
+    }
+    Serial.print(".");
+}
+
+void MyMQTT::onMqttPublishedTick_() {
+    Serial.print("MQTT: disconnecting from broker");
+    this->mqttClient_.disconnect();
+    this->pollRetries_ = MQTT_CONN_TIMEOUT / MQTT_CONN_TICK;
+    this->state_ = State::MQTT_DISCONNECTING;
+    this->setInterval(this->mqttSyncInterval_);
+}
+
+void MyMQTT::onMqttDisconnectTick_() {
+    if (!this->mqttClient_.connected()) {
+        Serial.println(" disconnected");
+        this->disconnectWifi_();
+        this->state_ = State::IDLE;
+        this->setInterval(this->defaultInterval_);
+        return;
+    }
+
+    if (this->pollRetries_-- <= 0) {
+        Serial.print(" timed out, state=");
+        Serial.println(this->mqttClient_.state());
+        this->disconnectWifi_();
+        this->state_ = State::IDLE;
+        this->setInterval(this->defaultInterval_);
+        return;
+    }
+
+    Serial.print(".");
 }
 
 void MyMQTT::disconnectWifi_() {
@@ -80,33 +159,13 @@ void MyMQTT::disconnectWifi_() {
     Serial.println("MQTT: WiFi disconnected");
 }
 
-bool MyMQTT::connectMqtt_() {
-    mqttClient_.setServer(brokerHost_, brokerPort_);
-    Serial.print("MQTT: connecting to broker");
-    unsigned long start = millis();
-    while (!mqttClient_.connected()) {
-        if (millis() - start >= MQTT_CONN_TIMEOUT) {
-            Serial.print(" timed out, state=");
-            Serial.println(mqttClient_.state());
-            return false;
-        }
-        mqttClient_.connect("esp8266-binary-clock", mqttUser_, mqttPassword_);
-        if (!mqttClient_.connected()) {
-            delay(500);
-            Serial.print(".");
-        }
-    }
-    Serial.println(" connected");
-    return true;
-}
-
 void MyMQTT::publishValue_(const char* subtopic, int value) {
     char topic[128];
     char valStr[8];
 
-    snprintf(topic, sizeof(topic), "%s/%s", topicPrefix_, subtopic);
+    snprintf(topic, sizeof(topic), "%s/%s", this->topicPrefix_, subtopic);
     snprintf(valStr, sizeof(valStr), "%d", value);
-    mqttClient_.publish(topic, valStr, true);
+    this->mqttClient_.publish(topic, valStr, true);
 
     Serial.print("MQTT: published ");
     Serial.print(topic);
@@ -115,6 +174,6 @@ void MyMQTT::publishValue_(const char* subtopic, int value) {
 }
 
 void MyMQTT::publish_() {
-    publishValue_("temperature", dht_->getTemperature());
-    publishValue_("humidity", dht_->getHumidity());
+    this->publishValue_("temperature", this->dht_->getTemperature());
+    this->publishValue_("humidity", this->dht_->getHumidity());
 }

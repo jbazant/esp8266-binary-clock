@@ -22,6 +22,8 @@ class MyMQTT : public WithTicker {
         void onTick();
 
     private:
+        enum class State { IDLE, WIFI_CONNECTING, MQTT_CONNECTING, PUBLISHING, MQTT_PUBLISHED, MQTT_DISCONNECTING };
+
         MyDHT* dht_;
         const char* ssid_;
         const char* password_;
@@ -38,9 +40,20 @@ class MyMQTT : public WithTicker {
         WiFiClient wifiClient_;
         PubSubClient mqttClient_;
 
-        bool connectWifi_();
+        State state_ = State::IDLE;
+        uint defaultInterval_;
+        uint wifiSyncInterval_;
+        uint mqttSyncInterval_;
+        uint mqttDisconnectInterval_;
+        int pollRetries_ = 0;
+
+        void startPublishCycle_();
+        void onWifiConnectTick_();
+        void onMqttConnectTick_();
+        void onWifiConnectionResolved_();
+        void onMqttPublishedTick_();
+        void onMqttDisconnectTick_();
         void disconnectWifi_();
-        bool connectMqtt_();
         void publish_();
         void publishValue_(const char* subtopic, int value);
 };
